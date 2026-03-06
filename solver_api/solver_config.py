@@ -14,9 +14,10 @@ class GameState(BaseModel):
     accuracy: float = Field(0.5, description="Target exploitability accuracy (percent)")
     max_iteration: int = Field(200, description="Maximum number of solver iterations")
 
-def generate_solver_config_content(state: GameState, output_json_path: str) -> str:
+def generate_solver_commands(state: GameState) -> list:
     """
-    Translates a GameState object into the text format expected by TexasSolver.
+    Returns a list of solver commands for the given game state.
+    The dump_result path is NOT included — it is added by the caller.
     """
     lines = []
     lines.append(f"set_pot {state.pot}")
@@ -24,9 +25,7 @@ def generate_solver_config_content(state: GameState, output_json_path: str) -> s
     lines.append(f"set_board {state.board}")
     lines.append(f"set_range_ip {state.range_ip}")
     lines.append(f"set_range_oop {state.range_oop}")
-    
-    # Static bet sizings. These should ideally be configurable,
-    # but for a start we'll use a standard set of sizes.
+
     lines.extend([
         "set_bet_sizes oop,flop,bet,50",
         "set_bet_sizes oop,flop,raise,60",
@@ -34,14 +33,14 @@ def generate_solver_config_content(state: GameState, output_json_path: str) -> s
         "set_bet_sizes ip,flop,bet,50",
         "set_bet_sizes ip,flop,raise,60",
         "set_bet_sizes ip,flop,allin",
-        
+
         "set_bet_sizes oop,turn,bet,50",
         "set_bet_sizes oop,turn,raise,60",
         "set_bet_sizes oop,turn,allin",
         "set_bet_sizes ip,turn,bet,50",
         "set_bet_sizes ip,turn,raise,60",
         "set_bet_sizes ip,turn,allin",
-        
+
         "set_bet_sizes oop,river,bet,50",
         "set_bet_sizes oop,river,donk,50",
         "set_bet_sizes oop,river,raise,60,100",
@@ -60,6 +59,4 @@ def generate_solver_config_content(state: GameState, output_json_path: str) -> s
     lines.append("set_use_isomorphism 1")
     lines.append("start_solve")
     lines.append("set_dump_rounds 2")
-    lines.append(f"dump_result {output_json_path}")
-    
-    return "\n".join(lines)
+    return lines
