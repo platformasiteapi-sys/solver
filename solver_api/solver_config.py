@@ -56,7 +56,7 @@ def generate_solver_config_content(state: GameState, output_json_path: str) -> s
     lines.append(f"set_thread_num {state.thread_num}")
     lines.append(f"set_accuracy {state.accuracy}")
     lines.append(f"set_max_iteration {state.max_iteration}")
-    lines.append("set_print_interval 10")
+    lines.append("set_print_interval 1")
     lines.append("set_use_isomorphism 1")
     lines.append("start_solve")
     lines.append("set_dump_rounds 2")
