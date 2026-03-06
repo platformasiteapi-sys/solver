@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TexasSolver API Tester</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #21262d;
+            --border: #30363d;
+            --accent: #58a6ff;
+            --accent-glow: rgba(88, 166, 255, 0.15);
+            --green: #3fb950;
+            --green-glow: rgba(63, 185, 80, 0.15);
+            --red: #f85149;
+            --red-glow: rgba(248, 81, 73, 0.15);
+            --yellow: #d29922;
+            --text: #e6edf3;
+            --text-muted: #7d8590;
+            --text-dim: #484f58;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Header ── */
+        header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .logo {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #58a6ff, #bc8cff);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+
+        header h1 { font-size: 18px; font-weight: 600; }
+        header span { font-size: 13px; color: var(--text-muted); margin-left: 4px; }
+
+        .status-dot {
+            margin-left: auto;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: var(--text-muted);
+        }
+
+        .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--text-dim);
+            transition: background 0.3s;
+        }
+        .dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+        .dot.error { background: var(--red); }
+
+        /* ── Layout ── */
+        main {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 0;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ── Left panel ── */
+        .panel {
+            padding: 24px;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .field-group { display: flex; flex-direction: column; gap: 12px; }
+
+        .field { display: flex; flex-direction: column; gap: 6px; }
+
+        label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        input, textarea, select {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            padding: 9px 12px;
+            width: 100%;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        textarea { resize: vertical; min-height: 80px; }
+
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        /* ── Solve Button ── */
+        #solveBtn {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            background: linear-gradient(135deg, #1f6feb, #58a6ff);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s, transform 0.1s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #solveBtn:hover { opacity: 0.9; }
+        #solveBtn:active { transform: scale(0.98); }
+        #solveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #solveBtn .spinner {
+            display: none;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Right panel ── */
+        .output-panel {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow: hidden;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .output-title { font-size: 14px; font-weight: 600; }
+
+        #timing-badge {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--green-glow);
+            border: 1px solid rgba(63,185,80,0.4);
+            color: var(--green);
+        }
+
+        .output-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .btn-sm:hover { color: var(--text); border-color: var(--accent); }
+        .btn-sm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        #output-area {
+            flex: 1;
+            overflow: auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        #output-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            color: var(--text-muted);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .placeholder-msg {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 12px;
+            color: var(--text-dim);
+        }
+
+        .placeholder-msg .icon { font-size: 40px; }
+        .placeholder-msg p { font-size: 14px; }
+
+        /* Status messages */
+        #status-msg {
+            font-size: 12px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #status-msg.error {
+            display: flex;
+            background: var(--red-glow);
+            border: 1px solid rgba(248,81,73,0.4);
+            color: var(--red);
+        }
+
+        #status-msg.info {
+            display: flex;
+            background: var(--accent-glow);
+            border: 1px solid rgba(88,166,255,0.4);
+            color: var(--accent);
+        }
+
+        /* Truncation notice */
+        #truncated-notice {
+            display: none;
+            font-size: 11px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: rgba(210, 153, 34, 0.1);
+            border: 1px solid rgba(210, 153, 34, 0.3);
+            color: var(--yellow);
+            flex-shrink: 0;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">♠</div>
+    <h1>TexasSolver API Tester</h1>
+    <span>v1.0</span>
+
+    <div class="status-dot">
+        <div class="dot" id="statusDot"></div>
+        <span id="statusLabel">Не подключено</span>
+    </div>
+</header>
+
+<main>
+    <!-- ── LEFT PANEL ── -->
+    <div class="panel">
+
+        <div>
+            <div class="section-title">🌐 Сервер</div>
+            <div class="field">
+                <label>URL сервера</label>
+                <input type="text" id="serverUrl" value="http://5.42.109.86:80" placeholder="http://ip-адрес:80">
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div>
+            <div class="section-title">🃏 Текущая раздача</div>
+            <div class="field-group">
+                <div class="row-2">
+                    <div class="field">
+                        <label>Пот (pot)</label>
+                        <input type="number" id="pot" value="50" step="0.5">
+                    </div>
+                    <div class="field">
+                        <label>Стэк (effective_stack)</label>
+                        <input type="number" id="stack" value="200" step="0.5">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Борд (board) <span class="badge">через запятую</span></label>
+                    <input type="text" id="board" value="Qs,Jh,2h" placeholder="Qs,Jh,2h">
+                </div>
+                <div class="field">
+                    <label>Рейндж IP (range_ip)</label>
+                    <textarea id="rangeIp">QQ:0.5,JJ:0.75,TT,99,88,77,66,55,44,33,22,AK</textarea>
+                </div>
+                <div class="field">
+                    <label>Рейндж OOP (range_oop)</label>
+                    <textarea id="rangeOop">AA,KK,QQ,JJ,TT,99:0.75,88:0.75,77:0.5</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div>
+            <div class="section-title">⚙️ Параметры солвера</div>
+            <div class="field-group">
+                <div class="row-2">
+                    <div class="field">
+                        <label>Потоки (thread_num)</label>
+                        <input type="number" id="threads" value="6" min="1" max="64">
+                    </div>
+                    <div class="field">
+                        <label>Точность (accuracy)</label>
+                        <input type="number" id="accuracy" value="0.5" step="0.1" min="0.01" max="5">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Макс. итераций (max_iteration)</label>
+                    <input type="number" id="maxIter" value="20" min="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <button id="solveBtn">
+            <div class="spinner" id="spinner"></div>
+            <span id="btnText">▶ Запустить расчёт</span>
+        </button>
+
+        <div id="status-msg"></div>
+    </div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <div class="output-panel">
+        <div class="output-header">
+            <span class="output-title">Результат</span>
+            <div id="timing-badge">
+                <span>⏱</span>
+                <span id="timing-val">—</span>
+            </div>
+            <div class="output-actions">
+                <button class="btn-sm" id="copyBtn" disabled>Копировать JSON</button>
+                <button class="btn-sm" id="downloadBtn" disabled>⬇ Скачать JSON</button>
+            </div>
+        </div>
+
+        <div id="truncated-notice"></div>
+
+        <div id="output-area">
+            <div class="placeholder-msg" id="placeholder">
+                <div class="icon">🎯</div>
+                <p>Результат расчёта появится здесь</p>
+            </div>
+            <pre id="output-text" style="display:none;"></pre>
+        </div>
+    </div>
+</main>
+
+<script>
+    const MAX_DISPLAY_CHARS = 8000;
+    let fullJsonData = null;
+    let fullJsonString = '';
+
+    // ── Ping the server on URL change ──
+    const serverUrlInput = document.getElementById('serverUrl');
+    const statusDot = document.getElementById('statusDot');
+    const statusLabel = document.getElementById('statusLabel');
+
+    async function ping() {
+        const url = serverUrlInput.value.trim().replace(/\/$/, '');
+        statusDot.className = 'dot';
+        statusLabel.textContent = 'Проверка...';
+        try {
+            const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(4000) });
+            if (r.ok) {
+                statusDot.className = 'dot online';
+                statusLabel.textContent = 'Сервер доступен';
+            } else {
+                throw new Error();
+            }
+        } catch {
+            statusDot.className = 'dot error';
+            statusLabel.textContent = 'Сервер недоступен';
+        }
+    }
+
+    serverUrlInput.addEventListener('change', ping);
+    window.addEventListener('load', ping);
+
+    // ── Solve ──
+    const solveBtn = document.getElementById('solveBtn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btnText');
+    const statusMsg = document.getElementById('status-msg');
+    const outputText = document.getElementById('output-text');
+    const placeholder = document.getElementById('placeholder');
+    const timingBadge = document.getElementById('timing-badge');
+    const timingVal = document.getElementById('timing-val');
+    const truncatedNotice = document.getElementById('truncated-notice');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    function setLoading(on) {
+        solveBtn.disabled = on;
+        spinner.style.display = on ? 'block' : 'none';
+        btnText.textContent = on ? 'Считаем...' : '▶ Запустить расчёт';
+    }
+
+    function showStatus(msg, type) {
+        statusMsg.textContent = msg;
+        statusMsg.className = type;
+    }
+
+    function hideStatus() {
+        statusMsg.className = '';
+        statusMsg.textContent = '';
+    }
+
+    solveBtn.addEventListener('click', async () => {
+        hideStatus();
+        setLoading(true);
+        fullJsonData = null; fullJsonString = '';
+        copyBtn.disabled = true; downloadBtn.disabled = true;
+        timingBadge.style.display = 'none';
+        truncatedNotice.style.display = 'none';
+        placeholder.style.display = 'flex';
+        outputText.style.display = 'none';
+
+        const url = serverUrlInput.value.trim().replace(/\/$/, '');
+
+        const body = {
+            pot: parseFloat(document.getElementById('pot').value),
+            effective_stack: parseFloat(document.getElementById('stack').value),
+            board: document.getElementById('board').value.trim(),
+            range_ip: document.getElementById('rangeIp').value.trim(),
+            range_oop: document.getElementById('rangeOop').value.trim(),
+            thread_num: parseInt(document.getElementById('threads').value),
+            accuracy: parseFloat(document.getElementById('accuracy').value),
+            max_iteration: parseInt(document.getElementById('maxIter').value),
+        };
+
+        const t0 = Date.now();
+        try {
+            const res = await fetch(`${url}/api/solve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                showStatus(`Ошибка сервера ${res.status}: ${data.detail || JSON.stringify(data)}`, 'error');
+            } else {
+                // Success
+                fullJsonData = data;
+                fullJsonString = JSON.stringify(data, null, 2);
+
+                timingVal.textContent = `${elapsed}s`;
+                timingBadge.style.display = 'flex';
+
+                placeholder.style.display = 'none';
+                outputText.style.display = 'block';
+
+                if (fullJsonString.length > MAX_DISPLAY_CHARS) {
+                    outputText.textContent = fullJsonString.slice(0, MAX_DISPLAY_CHARS) + '\n\n... [обрезано для отображения] ...';
+                    truncatedNotice.style.display = 'block';
+                    truncatedNotice.textContent = `⚠ Ответ слишком большой (${(fullJsonString.length/1024).toFixed(0)} КБ). Показаны первые ${MAX_DISPLAY_CHARS} символов. Скачайте полный JSON кнопкой выше.`;
+                } else {
+                    outputText.textContent = fullJsonString;
+                }
+
+                copyBtn.disabled = false;
+                downloadBtn.disabled = false;
+                // Update ping status
+                statusDot.className = 'dot online';
+                statusLabel.textContent = `Готово за ${elapsed}s`;
+            }
+        } catch (err) {
+            showStatus(`Не удалось подключиться к серверу: ${err.message}`, 'error');
+            statusDot.className = 'dot error';
+            statusLabel.textContent = 'Ошибка соединения';
+        } finally {
+            setLoading(false);
+        }
+    });
+
+    // ── Copy ──
+    copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(fullJsonString).then(() => {
+            const orig = copyBtn.textContent;
+            copyBtn.textContent = '✓ Скопировано!';
+            setTimeout(() => copyBtn.textContent = orig, 2000);
+        });
+    });
+
+    // ── Download ──
+    downloadBtn.addEventListener('click', () => {
+        const blob = new Blob([fullJsonString], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const ts = new Date().toISOString().slice(0,19).replace(/:/g,'-');
+        a.download = `solver_result_${ts}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    });
+</script>
+
+</body>
+</html>

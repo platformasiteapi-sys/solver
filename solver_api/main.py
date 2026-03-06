@@ -4,6 +4,7 @@ import uuid
 import subprocess
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from solver_config import GameState, generate_solver_config_content
@@ -13,6 +14,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="TexasSolver API Wrapper")
+
+# Allow requests from any origin (needed for the local HTML file tester)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Path to the TexasSolver executable, configurable via environment variable
 SOLVER_EXECUTABLE = os.getenv("SOLVER_PATH", "../console_solver") # Defaulting to linux binary
