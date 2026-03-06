@@ -27,26 +27,28 @@ def generate_solver_commands(state: GameState) -> list:
     lines.append(f"set_range_oop {state.range_oop}")
 
     lines.extend([
+        # Minimal Flop
         "set_bet_sizes oop,flop,bet,50",
-        "set_bet_sizes oop,flop,raise,60",
+        "set_bet_sizes oop,flop,raise,50",
         "set_bet_sizes oop,flop,allin",
         "set_bet_sizes ip,flop,bet,50",
-        "set_bet_sizes ip,flop,raise,60",
+        "set_bet_sizes ip,flop,raise,50",
         "set_bet_sizes ip,flop,allin",
 
+        # Minimal Turn
         "set_bet_sizes oop,turn,bet,50",
-        "set_bet_sizes oop,turn,raise,60",
+        "set_bet_sizes oop,turn,raise,50",
         "set_bet_sizes oop,turn,allin",
         "set_bet_sizes ip,turn,bet,50",
-        "set_bet_sizes ip,turn,raise,60",
+        "set_bet_sizes ip,turn,raise,50",
         "set_bet_sizes ip,turn,allin",
 
+        # Minimal River
         "set_bet_sizes oop,river,bet,50",
-        "set_bet_sizes oop,river,donk,50",
-        "set_bet_sizes oop,river,raise,60,100",
+        "set_bet_sizes oop,river,raise,50",
         "set_bet_sizes oop,river,allin",
         "set_bet_sizes ip,river,bet,50",
-        "set_bet_sizes ip,river,raise,60,100",
+        "set_bet_sizes ip,river,raise,50",
         "set_bet_sizes ip,river,allin"
     ])
 
