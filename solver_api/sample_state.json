@@ -1,0 +1,10 @@
+{
+  "pot": 50.0,
+  "effective_stack": 200.0,
+  "board": "Qs,Jh,2h",
+  "range_ip": "QQ:0.5,JJ:0.75,TT,99,88,77,66,55,44,33,22,AK",
+  "range_oop": "AA,KK,QQ,JJ,TT,99:0.75,88:0.75,77:0.5",
+  "thread_num": 6,
+  "accuracy": 0.5,
+  "max_iteration": 20
+}
