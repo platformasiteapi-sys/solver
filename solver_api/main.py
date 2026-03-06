@@ -40,7 +40,14 @@ async def _collect_log_until_file(output_path: str, timeout: int = 600) -> str:
             raise TimeoutError("Solver timed out after waiting for output file")
         # Check if the result file exists and is non-empty
         if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
-            # Drain any remaining lines briefly
+            # Wait for the file size to stabilize (solver may still be writing)
+            size_before = os.path.getsize(output_path)
+            await asyncio.sleep(0.2)
+            size_after = os.path.getsize(output_path)
+            if size_before != size_after:
+                # Still writing — keep waiting
+                continue
+            # Drain any remaining stdout lines briefly
             try:
                 while True:
                     raw = await asyncio.wait_for(solver_process.stdout.readline(), timeout=0.1)
