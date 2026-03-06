@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TexasSolver API Tester</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg: #0d1117;
@@ -24,7 +27,11 @@
             --text-dim: #484f58;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -46,29 +53,52 @@
         }
 
         .logo {
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             background: linear-gradient(135deg, #58a6ff, #bc8cff);
             border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 18px;
         }
 
-        header h1 { font-size: 18px; font-weight: 600; }
-        header span { font-size: 13px; color: var(--text-muted); margin-left: 4px; }
+        header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        header span {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
 
         .status-dot {
             margin-left: auto;
-            display: flex; align-items: center; gap: 8px;
-            font-size: 13px; color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
         }
 
         .dot {
-            width: 8px; height: 8px; border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
             background: var(--text-dim);
             transition: background 0.3s;
         }
-        .dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
-        .dot.error { background: var(--red); }
+
+        .dot.online {
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+        }
+
+        .dot.error {
+            background: var(--red);
+        }
 
         /* ── Layout ── */
         main {
@@ -98,9 +128,17 @@
             margin-bottom: 10px;
         }
 
-        .field-group { display: flex; flex-direction: column; gap: 12px; }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-        .field { display: flex; flex-direction: column; gap: 6px; }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
         label {
             font-size: 12px;
@@ -108,7 +146,9 @@
             color: var(--text-muted);
         }
 
-        input, textarea, select {
+        input,
+        textarea,
+        select {
             font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
             background: var(--surface2);
@@ -121,14 +161,22 @@
             outline: none;
         }
 
-        input:focus, textarea:focus {
+        input:focus,
+        textarea:focus {
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
-        textarea { resize: vertical; min-height: 80px; }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
 
-        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
 
         .divider {
             height: 1px;
@@ -167,20 +215,34 @@
             overflow: hidden;
         }
 
-        #solveBtn:hover { opacity: 0.9; }
-        #solveBtn:active { transform: scale(0.98); }
-        #solveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #solveBtn:hover {
+            opacity: 0.9;
+        }
+
+        #solveBtn:active {
+            transform: scale(0.98);
+        }
+
+        #solveBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
         #solveBtn .spinner {
             display: none;
-            width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* ── Right panel ── */
         .output-panel {
@@ -198,7 +260,10 @@
             flex-shrink: 0;
         }
 
-        .output-title { font-size: 14px; font-weight: 600; }
+        .output-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
 
         #timing-badge {
             display: none;
@@ -209,7 +274,7 @@
             font-size: 12px;
             font-weight: 600;
             background: var(--green-glow);
-            border: 1px solid rgba(63,185,80,0.4);
+            border: 1px solid rgba(63, 185, 80, 0.4);
             color: var(--green);
         }
 
@@ -232,8 +297,15 @@
             transition: all 0.2s;
         }
 
-        .btn-sm:hover { color: var(--text); border-color: var(--accent); }
-        .btn-sm:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-sm:hover {
+            color: var(--text);
+            border-color: var(--accent);
+        }
+
+        .btn-sm:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
 
         #output-area {
             flex: 1;
@@ -242,6 +314,34 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 16px;
+        }
+
+        #log-area {
+            height: 180px;
+            overflow: auto;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            flex-shrink: 0;
+        }
+
+        .log-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        #log-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            line-height: 1.7;
+            color: #3fb950;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
         #output-text {
@@ -263,8 +363,13 @@
             color: var(--text-dim);
         }
 
-        .placeholder-msg .icon { font-size: 40px; }
-        .placeholder-msg p { font-size: 14px; }
+        .placeholder-msg .icon {
+            font-size: 40px;
+        }
+
+        .placeholder-msg p {
+            font-size: 14px;
+        }
 
         /* Status messages */
         #status-msg {
@@ -279,14 +384,14 @@
         #status-msg.error {
             display: flex;
             background: var(--red-glow);
-            border: 1px solid rgba(248,81,73,0.4);
+            border: 1px solid rgba(248, 81, 73, 0.4);
             color: var(--red);
         }
 
         #status-msg.info {
             display: flex;
             background: var(--accent-glow);
-            border: 1px solid rgba(88,166,255,0.4);
+            border: 1px solid rgba(88, 166, 255, 0.4);
             color: var(--accent);
         }
 
@@ -303,276 +408,304 @@
         }
 
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-dim);
+        }
     </style>
 </head>
+
 <body>
 
-<header>
-    <div class="logo">♠</div>
-    <h1>TexasSolver API Tester</h1>
-    <span>v1.0</span>
+    <header>
+        <div class="logo">♠</div>
+        <h1>TexasSolver API Tester</h1>
+        <span>v1.0</span>
 
-    <div class="status-dot">
-        <div class="dot" id="statusDot"></div>
-        <span id="statusLabel">Не подключено</span>
-    </div>
-</header>
-
-<main>
-    <!-- ── LEFT PANEL ── -->
-    <div class="panel">
-
-        <div>
-            <div class="section-title">🌐 Сервер</div>
-            <div class="field">
-                <label>URL сервера</label>
-                <input type="text" id="serverUrl" value="http://5.42.109.86:80" placeholder="http://ip-адрес:80">
-            </div>
+        <div class="status-dot">
+            <div class="dot" id="statusDot"></div>
+            <span id="statusLabel">Не подключено</span>
         </div>
+    </header>
 
-        <div class="divider"></div>
+    <main>
+        <!-- ── LEFT PANEL ── -->
+        <div class="panel">
 
-        <div>
-            <div class="section-title">🃏 Текущая раздача</div>
-            <div class="field-group">
-                <div class="row-2">
-                    <div class="field">
-                        <label>Пот (pot)</label>
-                        <input type="number" id="pot" value="50" step="0.5">
+            <div>
+                <div class="section-title">🌐 Сервер</div>
+                <div class="field">
+                    <label>URL сервера</label>
+                    <input type="text" id="serverUrl" value="http://5.42.109.86:80" placeholder="http://ip-адрес:80">
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div>
+                <div class="section-title">🃏 Текущая раздача</div>
+                <div class="field-group">
+                    <div class="row-2">
+                        <div class="field">
+                            <label>Пот (pot)</label>
+                            <input type="number" id="pot" value="50" step="0.5">
+                        </div>
+                        <div class="field">
+                            <label>Стэк (effective_stack)</label>
+                            <input type="number" id="stack" value="200" step="0.5">
+                        </div>
                     </div>
                     <div class="field">
-                        <label>Стэк (effective_stack)</label>
-                        <input type="number" id="stack" value="200" step="0.5">
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Борд (board) <span class="badge">через запятую</span></label>
-                    <input type="text" id="board" value="Qs,Jh,2h" placeholder="Qs,Jh,2h">
-                </div>
-                <div class="field">
-                    <label>Рейндж IP (range_ip)</label>
-                    <textarea id="rangeIp">QQ:0.5,JJ:0.75,TT,99,88,77,66,55,44,33,22,AK</textarea>
-                </div>
-                <div class="field">
-                    <label>Рейндж OOP (range_oop)</label>
-                    <textarea id="rangeOop">AA,KK,QQ,JJ,TT,99:0.75,88:0.75,77:0.5</textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div>
-            <div class="section-title">⚙️ Параметры солвера</div>
-            <div class="field-group">
-                <div class="row-2">
-                    <div class="field">
-                        <label>Потоки (thread_num)</label>
-                        <input type="number" id="threads" value="6" min="1" max="64">
+                        <label>Борд (board) <span class="badge">через запятую</span></label>
+                        <input type="text" id="board" value="Qs,Jh,2h" placeholder="Qs,Jh,2h">
                     </div>
                     <div class="field">
-                        <label>Точность (accuracy)</label>
-                        <input type="number" id="accuracy" value="0.5" step="0.1" min="0.01" max="5">
+                        <label>Рейндж IP (range_ip)</label>
+                        <textarea id="rangeIp">QQ:0.5,JJ:0.75,TT,99,88,77,66,55,44,33,22,AK</textarea>
+                    </div>
+                    <div class="field">
+                        <label>Рейндж OOP (range_oop)</label>
+                        <textarea id="rangeOop">AA,KK,QQ,JJ,TT,99:0.75,88:0.75,77:0.5</textarea>
                     </div>
                 </div>
-                <div class="field">
-                    <label>Макс. итераций (max_iteration)</label>
-                    <input type="number" id="maxIter" value="20" min="1">
+            </div>
+
+            <div class="divider"></div>
+
+            <div>
+                <div class="section-title">⚙️ Параметры солвера</div>
+                <div class="field-group">
+                    <div class="row-2">
+                        <div class="field">
+                            <label>Потоки (thread_num)</label>
+                            <input type="number" id="threads" value="6" min="1" max="64">
+                        </div>
+                        <div class="field">
+                            <label>Точность (accuracy)</label>
+                            <input type="number" id="accuracy" value="0.5" step="0.1" min="0.01" max="5">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Макс. итераций (max_iteration)</label>
+                        <input type="number" id="maxIter" value="20" min="1">
+                    </div>
                 </div>
             </div>
+
+            <div class="divider"></div>
+
+            <button id="solveBtn">
+                <div class="spinner" id="spinner"></div>
+                <span id="btnText">▶ Запустить расчёт</span>
+            </button>
+
+            <div id="status-msg"></div>
         </div>
 
-        <div class="divider"></div>
-
-        <button id="solveBtn">
-            <div class="spinner" id="spinner"></div>
-            <span id="btnText">▶ Запустить расчёт</span>
-        </button>
-
-        <div id="status-msg"></div>
-    </div>
-
-    <!-- ── RIGHT PANEL ── -->
-    <div class="output-panel">
-        <div class="output-header">
-            <span class="output-title">Результат</span>
-            <div id="timing-badge">
-                <span>⏱</span>
-                <span id="timing-val">—</span>
+        <!-- ── RIGHT PANEL ── -->
+        <div class="output-panel">
+            <div class="output-header">
+                <span class="output-title">Результат</span>
+                <div id="timing-badge">
+                    <span>⏱</span>
+                    <span id="timing-val">—</span>
+                </div>
+                <div class="output-actions">
+                    <button class="btn-sm" id="copyBtn" disabled>Копировать JSON</button>
+                    <button class="btn-sm" id="downloadBtn" disabled>⬇ Скачать JSON</button>
+                </div>
             </div>
-            <div class="output-actions">
-                <button class="btn-sm" id="copyBtn" disabled>Копировать JSON</button>
-                <button class="btn-sm" id="downloadBtn" disabled>⬇ Скачать JSON</button>
+
+            <div id="truncated-notice"></div>
+
+            <div id="log-area">
+                <div class="log-title">📋 Лог солвера</div>
+                <pre id="log-text">Лог появится после расчёта...</pre>
+            </div>
+
+            <div id="output-area">
+                <div class="placeholder-msg" id="placeholder">
+                    <div class="icon">🎯</div>
+                    <p>Результат расчёта появится здесь</p>
+                </div>
+                <pre id="output-text" style="display:none;"></pre>
             </div>
         </div>
+    </main>
 
-        <div id="truncated-notice"></div>
+    <script>
+        const MAX_DISPLAY_CHARS = 8000;
+        let fullJsonData = null;
+        let fullJsonString = '';
 
-        <div id="output-area">
-            <div class="placeholder-msg" id="placeholder">
-                <div class="icon">🎯</div>
-                <p>Результат расчёта появится здесь</p>
-            </div>
-            <pre id="output-text" style="display:none;"></pre>
-        </div>
-    </div>
-</main>
+        // ── Ping the server on URL change ──
+        const serverUrlInput = document.getElementById('serverUrl');
+        const statusDot = document.getElementById('statusDot');
+        const statusLabel = document.getElementById('statusLabel');
 
-<script>
-    const MAX_DISPLAY_CHARS = 8000;
-    let fullJsonData = null;
-    let fullJsonString = '';
-
-    // ── Ping the server on URL change ──
-    const serverUrlInput = document.getElementById('serverUrl');
-    const statusDot = document.getElementById('statusDot');
-    const statusLabel = document.getElementById('statusLabel');
-
-    async function ping() {
-        const url = serverUrlInput.value.trim().replace(/\/$/, '');
-        statusDot.className = 'dot';
-        statusLabel.textContent = 'Проверка...';
-        try {
-            const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(4000) });
-            if (r.ok) {
-                statusDot.className = 'dot online';
-                statusLabel.textContent = 'Сервер доступен';
-            } else {
-                throw new Error();
-            }
-        } catch {
-            statusDot.className = 'dot error';
-            statusLabel.textContent = 'Сервер недоступен';
-        }
-    }
-
-    serverUrlInput.addEventListener('change', ping);
-    window.addEventListener('load', ping);
-
-    // ── Solve ──
-    const solveBtn = document.getElementById('solveBtn');
-    const spinner = document.getElementById('spinner');
-    const btnText = document.getElementById('btnText');
-    const statusMsg = document.getElementById('status-msg');
-    const outputText = document.getElementById('output-text');
-    const placeholder = document.getElementById('placeholder');
-    const timingBadge = document.getElementById('timing-badge');
-    const timingVal = document.getElementById('timing-val');
-    const truncatedNotice = document.getElementById('truncated-notice');
-    const copyBtn = document.getElementById('copyBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-
-    function setLoading(on) {
-        solveBtn.disabled = on;
-        spinner.style.display = on ? 'block' : 'none';
-        btnText.textContent = on ? 'Считаем...' : '▶ Запустить расчёт';
-    }
-
-    function showStatus(msg, type) {
-        statusMsg.textContent = msg;
-        statusMsg.className = type;
-    }
-
-    function hideStatus() {
-        statusMsg.className = '';
-        statusMsg.textContent = '';
-    }
-
-    solveBtn.addEventListener('click', async () => {
-        hideStatus();
-        setLoading(true);
-        fullJsonData = null; fullJsonString = '';
-        copyBtn.disabled = true; downloadBtn.disabled = true;
-        timingBadge.style.display = 'none';
-        truncatedNotice.style.display = 'none';
-        placeholder.style.display = 'flex';
-        outputText.style.display = 'none';
-
-        const url = serverUrlInput.value.trim().replace(/\/$/, '');
-
-        const body = {
-            pot: parseFloat(document.getElementById('pot').value),
-            effective_stack: parseFloat(document.getElementById('stack').value),
-            board: document.getElementById('board').value.trim(),
-            range_ip: document.getElementById('rangeIp').value.trim(),
-            range_oop: document.getElementById('rangeOop').value.trim(),
-            thread_num: parseInt(document.getElementById('threads').value),
-            accuracy: parseFloat(document.getElementById('accuracy').value),
-            max_iteration: parseInt(document.getElementById('maxIter').value),
-        };
-
-        const t0 = Date.now();
-        try {
-            const res = await fetch(`${url}/api/solve`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-
-            const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                showStatus(`Ошибка сервера ${res.status}: ${data.detail || JSON.stringify(data)}`, 'error');
-            } else {
-                // Success
-                fullJsonData = data;
-                fullJsonString = JSON.stringify(data, null, 2);
-
-                timingVal.textContent = `${elapsed}s`;
-                timingBadge.style.display = 'flex';
-
-                placeholder.style.display = 'none';
-                outputText.style.display = 'block';
-
-                if (fullJsonString.length > MAX_DISPLAY_CHARS) {
-                    outputText.textContent = fullJsonString.slice(0, MAX_DISPLAY_CHARS) + '\n\n... [обрезано для отображения] ...';
-                    truncatedNotice.style.display = 'block';
-                    truncatedNotice.textContent = `⚠ Ответ слишком большой (${(fullJsonString.length/1024).toFixed(0)} КБ). Показаны первые ${MAX_DISPLAY_CHARS} символов. Скачайте полный JSON кнопкой выше.`;
+        async function ping() {
+            const url = serverUrlInput.value.trim().replace(/\/$/, '');
+            statusDot.className = 'dot';
+            statusLabel.textContent = 'Проверка...';
+            try {
+                const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(4000) });
+                if (r.ok) {
+                    statusDot.className = 'dot online';
+                    statusLabel.textContent = 'Сервер доступен';
                 } else {
-                    outputText.textContent = fullJsonString;
+                    throw new Error();
                 }
-
-                copyBtn.disabled = false;
-                downloadBtn.disabled = false;
-                // Update ping status
-                statusDot.className = 'dot online';
-                statusLabel.textContent = `Готово за ${elapsed}s`;
+            } catch {
+                statusDot.className = 'dot error';
+                statusLabel.textContent = 'Сервер недоступен';
             }
-        } catch (err) {
-            showStatus(`Не удалось подключиться к серверу: ${err.message}`, 'error');
-            statusDot.className = 'dot error';
-            statusLabel.textContent = 'Ошибка соединения';
-        } finally {
-            setLoading(false);
         }
-    });
 
-    // ── Copy ──
-    copyBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(fullJsonString).then(() => {
-            const orig = copyBtn.textContent;
-            copyBtn.textContent = '✓ Скопировано!';
-            setTimeout(() => copyBtn.textContent = orig, 2000);
+        serverUrlInput.addEventListener('change', ping);
+        window.addEventListener('load', ping);
+
+        // ── Solve ──
+        const solveBtn = document.getElementById('solveBtn');
+        const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btnText');
+        const statusMsg = document.getElementById('status-msg');
+        const outputText = document.getElementById('output-text');
+        const placeholder = document.getElementById('placeholder');
+        const timingBadge = document.getElementById('timing-badge');
+        const timingVal = document.getElementById('timing-val');
+        const truncatedNotice = document.getElementById('truncated-notice');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const logText = document.getElementById('log-text');
+
+        function setLoading(on) {
+            solveBtn.disabled = on;
+            spinner.style.display = on ? 'block' : 'none';
+            btnText.textContent = on ? 'Считаем...' : '▶ Запустить расчёт';
+        }
+
+        function showStatus(msg, type) {
+            statusMsg.textContent = msg;
+            statusMsg.className = type;
+        }
+
+        function hideStatus() {
+            statusMsg.className = '';
+            statusMsg.textContent = '';
+        }
+
+        solveBtn.addEventListener('click', async () => {
+            hideStatus();
+            setLoading(true);
+            fullJsonData = null; fullJsonString = '';
+            copyBtn.disabled = true; downloadBtn.disabled = true;
+            timingBadge.style.display = 'none';
+            truncatedNotice.style.display = 'none';
+            placeholder.style.display = 'flex';
+            outputText.style.display = 'none';
+
+            const url = serverUrlInput.value.trim().replace(/\/$/, '');
+
+            const body = {
+                pot: parseFloat(document.getElementById('pot').value),
+                effective_stack: parseFloat(document.getElementById('stack').value),
+                board: document.getElementById('board').value.trim(),
+                range_ip: document.getElementById('rangeIp').value.trim(),
+                range_oop: document.getElementById('rangeOop').value.trim(),
+                thread_num: parseInt(document.getElementById('threads').value),
+                accuracy: parseFloat(document.getElementById('accuracy').value),
+                max_iteration: parseInt(document.getElementById('maxIter').value),
+            };
+
+            const t0 = Date.now();
+            try {
+                const res = await fetch(`${url}/api/solve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showStatus(`Ошибка сервера ${res.status}: ${data.detail || JSON.stringify(data)}`, 'error');
+                } else {
+                    // Success
+                    fullJsonData = data;
+                    fullJsonString = JSON.stringify(data, null, 2);
+
+                    timingVal.textContent = `${elapsed}s`;
+                    timingBadge.style.display = 'flex';
+
+                    // Show log
+                    if (data.solver_log) {
+                        logText.textContent = data.solver_log.trim();
+                    } else {
+                        logText.textContent = '(лог недоступен)';
+                    }
+
+                    placeholder.style.display = 'none';
+                    outputText.style.display = 'block';
+
+                    if (fullJsonString.length > MAX_DISPLAY_CHARS) {
+                        outputText.textContent = fullJsonString.slice(0, MAX_DISPLAY_CHARS) + '\n\n... [обрезано для отображения] ...';
+                        truncatedNotice.style.display = 'block';
+                        truncatedNotice.textContent = `⚠ Ответ слишком большой (${(fullJsonString.length / 1024).toFixed(0)} КБ). Показаны первые ${MAX_DISPLAY_CHARS} символов. Скачайте полный JSON кнопкой выше.`;
+                    } else {
+                        outputText.textContent = fullJsonString;
+                    }
+
+                    copyBtn.disabled = false;
+                    downloadBtn.disabled = false;
+                    // Update ping status
+                    statusDot.className = 'dot online';
+                    statusLabel.textContent = `Готово за ${elapsed}s`;
+                }
+            } catch (err) {
+                showStatus(`Не удалось подключиться к серверу: ${err.message}`, 'error');
+                statusDot.className = 'dot error';
+                statusLabel.textContent = 'Ошибка соединения';
+            } finally {
+                setLoading(false);
+            }
         });
-    });
 
-    // ── Download ──
-    downloadBtn.addEventListener('click', () => {
-        const blob = new Blob([fullJsonString], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        const ts = new Date().toISOString().slice(0,19).replace(/:/g,'-');
-        a.download = `solver_result_${ts}.json`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-    });
-</script>
+        // ── Copy ──
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(fullJsonString).then(() => {
+                const orig = copyBtn.textContent;
+                copyBtn.textContent = '✓ Скопировано!';
+                setTimeout(() => copyBtn.textContent = orig, 2000);
+            });
+        });
+
+        // ── Download ──
+        downloadBtn.addEventListener('click', () => {
+            const blob = new Blob([fullJsonString], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            const ts = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            a.download = `solver_result_${ts}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        });
+    </script>
 
 </body>
+
 </html>

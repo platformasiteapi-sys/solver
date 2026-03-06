@@ -90,7 +90,12 @@ async def solve_poker_state(state: GameState):
         # os.remove(config_file_path)
         # os.remove(output_json_path)
             
-        return JSONResponse(content={"status": "success", "run_id": run_id, "strategy": strategy_data})
+        return JSONResponse(content={
+            "status": "success",
+            "run_id": run_id,
+            "solver_log": stdout,
+            "strategy": strategy_data
+        })
 
     except json.JSONDecodeError:
          logger.error(f"Failed to parse output JSON for run {run_id}")
