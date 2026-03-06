@@ -95,6 +95,7 @@ async def start_solver_process():
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,  # merge stderr into stdout
         cwd=solver_cwd,
+        limit=10 * 1024 * 1024  # Increase limit to 10MB to prevent LimitOverrunError on huge ranges
     )
     await _drain_startup(timeout_idle=2.0)
     logger.info("Solver process is ready.")
