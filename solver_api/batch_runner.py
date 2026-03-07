@@ -189,9 +189,16 @@ def main():
             
             if os.path.exists(dump_filepath):
                 logging.info(f"SUCCESS! Result saved to {dump_filepath}")
+                # Save solver log for convergence verification (same name, .log extension)
+                log_filepath = dump_filepath.replace(".json", ".log")
+                with open(log_filepath, "w", encoding="utf-8") as lf:
+                    lf.write(output)
             else:
                 logging.error(f"Failed to generate dump file for {board_str}")
-                # print output summary
+                # Save error log for debugging
+                err_log_path = dump_filepath.replace(".json", ".error.log")
+                with open(err_log_path, "w", encoding="utf-8") as lf:
+                    lf.write(output)
                 lines = output.split('\n')
                 logging.error("Last 10 lines of solver output:")
                 for line in lines[-10:]:

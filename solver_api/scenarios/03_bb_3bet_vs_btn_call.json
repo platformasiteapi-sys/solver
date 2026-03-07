@@ -9,7 +9,7 @@
     "range_oop": "JJ+, AQs+, AKo, AKs",
     "solver_settings": {
         "allin_threshold": 0.67,
-        "thread_num": 6,
+        "thread_num": 14,
         "accuracy": 0.5,
         "max_iteration": 200,
         "tree_config": {

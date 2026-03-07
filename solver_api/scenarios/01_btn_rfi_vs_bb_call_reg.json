@@ -9,7 +9,7 @@
   "range_oop": "AA:0.2, KK:0.2, QQ:0.2, AKs:0.2, AKo:0.2, 22-TT, A2s-AJs, K9s-KQs, Q9s-QJs, J9s-JTs, T8s-T9s, 97s-98s, 87s, 76s, 65s, ATo-AQo, KTo-KQo, QTo-QJo, JTo",
   "solver_settings": {
     "allin_threshold": 0.67,
-    "thread_num": 6,
+    "thread_num": 14,
     "accuracy": 0.5,
     "max_iteration": 200,
     "tree_config": {
