@@ -9,7 +9,12 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 
 # Paths configuration
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-FLOP_FILE_PATH = os.path.join(SCRIPT_DIR, "..", "kuba_184_flops_5_11_2015.txt")
+FLOP_FILENAME = "kuba_184_flops_5_11_2015.txt"
+# In Docker, the flop file is in the same dir as the script (/app/).
+# Locally, it's one level up (../). Check both locations.
+_flop_same_dir = os.path.join(SCRIPT_DIR, FLOP_FILENAME)
+_flop_parent_dir = os.path.join(SCRIPT_DIR, "..", FLOP_FILENAME)
+FLOP_FILE_PATH = _flop_same_dir if os.path.exists(_flop_same_dir) else _flop_parent_dir
 SCENARIOS_DIR = os.path.join(SCRIPT_DIR, "scenarios")
 DB_DIR = os.path.join(SCRIPT_DIR, "precalculated_db")
 SOLVER_EXE = os.getenv("SOLVER_PATH", os.path.join(SCRIPT_DIR, "..", "linux_bin", "console_solver"))

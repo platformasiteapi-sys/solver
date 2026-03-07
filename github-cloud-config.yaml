@@ -18,7 +18,8 @@ runcmd:
   # 2. Clone the repository
   - git clone https://<????_?????>@github.com/platformasiteapi-sys/solver.git /root/texassolver-api
   
-  # 3. Build and Run the Docker container
-  - cd /root/texassolver-api
-  - docker build -t texassolver-api .
-  - docker run -d --name solver_api_container -p 80:8000 --restart always texassolver-api
+  # 3. Build and Run the Docker container (must be in one block — cd doesn't persist between runcmd items)
+  - |
+    cd /root/texassolver-api
+    docker build -t texassolver-api .
+    docker run -d --name solver_api_container -p 80:8000 --restart always texassolver-api
