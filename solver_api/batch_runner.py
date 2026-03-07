@@ -115,9 +115,9 @@ def generate_solver_commands(scenario: Dict, flop: str, dump_path: str) -> List[
     cmds.append("set_use_isomorphism 1")
     cmds.append("start_solve")
     
-    # Only dump flop-level strategy (rounds 0 = flop only)
-    # Turn/river will be computed in real-time by the bot
-    cmds.append("set_dump_rounds 0")
+    # Dump flop-level strategy (rounds: 1 = flop, 2 = flop+turn+river)
+    # Note: set_dump_rounds 0 produces null — must be at least 1
+    cmds.append("set_dump_rounds 1")
     cmds.append(f"dump_result {dump_path}")
     cmds.append("exit")
     
