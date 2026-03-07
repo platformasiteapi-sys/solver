@@ -25,7 +25,56 @@ def expand_range(compact_range: str) -> str:
             combo = parts[0]
             weight = ":" + str(parts[1])
             
-        if '+' in combo:
+        if '-' in combo:
+            parts = combo.split('-')
+            if len(parts) == 2:
+                start_c = parts[0]
+                end_c = parts[1]
+                
+                # Pairs: 66-JJ -> 66, 77, 88, 99, TT, JJ
+                if len(start_c) == 2 and start_c[0] == start_c[1] and len(end_c) == 2 and end_c[0] == end_c[1]:
+                    start_idx = ranks.find(start_c[0])
+                    end_idx = ranks.find(end_c[0])
+                    if start_idx > end_idx:
+                        start_idx, end_idx = end_idx, start_idx
+                    for i in range(start_idx, end_idx + 1):
+                        expanded.append(ranks[i] + ranks[i] + weight)
+                        
+                # Suited/Offsuit: A2s-AJs or K8o-KQo
+                elif len(start_c) == 3 and start_c[2] in ['s', 'o'] and len(end_c) == 3 and end_c[2] == start_c[2]:
+                    r1 = start_c[0]
+                    suit = start_c[2]
+                    
+                    if r1 == end_c[0]:
+                        start_idx2 = ranks.find(start_c[1])
+                        end_idx2 = ranks.find(end_c[1])
+                        if start_idx2 > end_idx2:
+                            start_idx2, end_idx2 = end_idx2, start_idx2
+                        
+                        for i in range(start_idx2, end_idx2 + 1):
+                            expanded.append(r1 + ranks[i] + suit + weight)
+                    # Handled mixed rank '-' like 96s-98s (meaning 96s, 97s, 98s)
+                    elif start_c[0] == end_c[0]:
+                         # Wait, this is the same as r1 == end_c[0] handled above.
+                         pass
+                    else:
+                        expanded.append(combo + weight)
+                # Handle things like 86s-87s, 75s-76s exactly as above (since r1 == end_c[0])
+                elif len(start_c) == 3 and len(end_c) == 3 and start_c[0] == end_c[0] and start_c[2] == end_c[2]:
+                    r1 = start_c[0]
+                    suit = start_c[2]
+                    start_idx2 = ranks.find(start_c[1])
+                    end_idx2 = ranks.find(end_c[1])
+                    if start_idx2 > end_idx2:
+                        start_idx2, end_idx2 = end_idx2, start_idx2
+                    for i in range(start_idx2, end_idx2 + 1):
+                        expanded.append(r1 + ranks[i] + suit + weight)
+                else:
+                    expanded.append(combo + weight)
+            else:
+                expanded.append(combo + weight)
+                
+        elif '+' in combo:
             base = combo.replace('+', '')
             
             # Pairs: 22+ -> 22, 33, 44... AA

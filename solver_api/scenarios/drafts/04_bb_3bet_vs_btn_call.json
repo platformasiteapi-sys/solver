@@ -1,0 +1,23 @@
+{
+  "scenario_id": "04_bb_3bet_vs_btn_call",
+  "description": "BTN Opens 2.5bb. Hero (BB) 3-bets to 10bb. BTN Calls. 3-Bet Pot.",
+  "pot": 20.5,
+  "effective_stack": 90.0,
+  "board": "",
+  "ip_player": "Villain_BTN_Caller",
+  "oop_player": "Hero_BB_3Bettor",
+  "range_ip": "77-JJ, AQs-ATs, KQs-KTs, QJs-QTs, JTs, T9s, 98s, 87s, 76s, AQo, KQo",
+  "range_oop": "JJ+, AQs+, AKo, AKs, KQs, A5s",
+  "solver_settings": {
+    "allin_threshold": 0.67,
+    "thread_num": 6,
+    "accuracy": 0.5,
+    "max_iteration": 200,
+    "tree_config": {
+      "oop_flop": ["check", "bet_33"],
+      "ip_flop_bet": [33, 50],
+      "oop_flop_raise": [50],
+      "ip_flop_raise": [50]
+    }
+  }
+}

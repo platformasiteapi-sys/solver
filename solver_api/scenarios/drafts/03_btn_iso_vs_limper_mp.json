@@ -1,0 +1,23 @@
+{
+  "scenario_id": "03_btn_iso_vs_limper_mp",
+  "description": "Fish (MP) Limps. Hero (BTN) Iso-Raises to 4bb. Fish Calls. Single Raised Pot.",
+  "pot": 9.5,
+  "effective_stack": 96.0,
+  "board": "",
+  "ip_player": "Hero_BTN_Iso",
+  "oop_player": "Villain_MP_Limper",
+  "range_ip": "55+, A2s+, K9s+, Q9s+, J9s+, T9s, 98s, 87s, ATo+, KJo+, QJo",
+  "range_oop": "22-99, A2s-ATs, K2s-KJs, Q2s-QJs, J7s-JTs, T7s-T9s, 97s-98s, 86s-87s, 75s-76s, 65s, A2o-AJo, K7o-KQo, Q7o-QJo, J8o-JTo, T8o-T9o, 98o",
+  "solver_settings": {
+    "allin_threshold": 0.67,
+    "thread_num": 6,
+    "accuracy": 0.5,
+    "max_iteration": 200,
+    "tree_config": {
+      "oop_flop": ["check"],
+      "ip_flop_bet": [40, 75],
+      "oop_flop_raise": [50],
+      "ip_flop_raise": [50]
+    }
+  }
+}

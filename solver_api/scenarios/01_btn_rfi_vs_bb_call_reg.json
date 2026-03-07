@@ -1,0 +1,60 @@
+{
+  "scenario_id": "01_btn_rfi_vs_bb_call_reg",
+  "description": "Опен-рейз с Баттона (BTN), Регуляр на Большом Блайнде (BB) коллирует.",
+  "pot": 5.5,
+  "effective_stack": 97.5,
+  "ip_player": "Hero_BTN",
+  "oop_player": "Villain_BB_Reg",
+  "range_ip": "22+, A2s+, K2s+, Q2s+, J7s+, T7s+, 97s+, 87s, 76s, 65s, A2o+, K8o+, Q9o+, J8o+, T8o+",
+  "range_oop": "AA:0.2, KK:0.2, QQ:0.2, AKs:0.2, AKo:0.2, 22-TT, A2s-AJs, K9s-KQs, Q9s-QJs, J9s-JTs, T8s-T9s, 97s-98s, 87s, 76s, 65s, ATo-AQo, KTo-KQo, QTo-QJo, JTo",
+  "solver_settings": {
+    "allin_threshold": 0.67,
+    "thread_num": 6,
+    "accuracy": 0.5,
+    "max_iteration": 200,
+    "tree_config": {
+      "oop_flop": [
+        "check"
+      ],
+      "ip_flop_bet": [
+        33,
+        75
+      ],
+      "oop_flop_raise": [
+        50
+      ],
+      "ip_flop_raise": [
+        50
+      ],
+      "oop_turn": [
+        "check"
+      ],
+      "ip_turn_bet": [
+        50,
+        150
+      ],
+      "oop_turn_raise": [
+        50
+      ],
+      "ip_turn_raise": [
+        50
+      ],
+      "turn_allin": true,
+      "oop_river": [
+        "check"
+      ],
+      "ip_river_bet": [
+        75,
+        150
+      ],
+      "oop_river_raise": [
+        50
+      ],
+      "ip_river_raise": [
+        50
+      ],
+      "river_allin": true,
+      "raise_limit": 2
+    }
+  }
+}

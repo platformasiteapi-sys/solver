@@ -10,11 +10,12 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the python API code
-COPY solver_api/requirements.txt .
+# Copy the entire api folder (includes main.py, batch_runner.py, range_expander.py, scenarios, admin.html)
+COPY solver_api /app/
 RUN pip install --no-cache-dir -r requirements.txt
-COPY solver_api/main.py .
-COPY solver_api/solver_config.py .
+
+# Copy the flop definition subset
+COPY kuba_184_flops_5_11_2015.txt /app/kuba_184_flops_5_11_2015.txt
 
 # IMPORTANT: The linux release of the solver!
 # The user MUST put the Linux `console_solver` binary AND the `resources` folder into

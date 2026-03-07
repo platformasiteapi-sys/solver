@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TexasSolver API Admin</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #bb86fc;
+            --primary-variant: #3700b3;
+            --secondary-color: #03dac6;
+            --text-color: #ffffff;
+            --error-color: #cf6679;
+            --success-color: #4caf50;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--surface-color);
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--secondary-color);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .status-idle { background-color: var(--surface-color); color: var(--text-color); border: 1px solid var(--text-color); }
+        .status-running { background-color: var(--primary-variant); color: var(--text-color); animation: pulse 2s infinite; }
+        .status-error { background-color: var(--error-color); color: var(--bg-color); }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(187, 134, 252, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(187, 134, 252, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(187, 134, 252, 0); }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        th { color: var(--secondary-color); }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.8; }
+        .btn:disabled { background-color: #555; cursor: not-allowed; }
+        .btn-download { background-color: var(--success-color); }
+
+        select[multiple] {
+            width: 100%;
+            height: 120px;
+            background-color: #2a2a2a;
+            color: white;
+            border: 1px solid #444;
+            border-radius: var(--border-radius);
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        option { padding: 5px; }
+        
+        #logArea {
+            width: 100%;
+            height: 100px;
+            background-color: #000;
+            color: #0f0;
+            font-family: monospace;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: var(--border-radius);
+            overflow-y: auto;
+            border: 1px solid #333;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>TexasSolver Cloud Command</h1>
+
+    <div class="card">
+        <h2>Cluster Status: <span id="globalStatus" class="status-badge status-idle">IDLE</span></h2>
+        
+        <table id="progressTable">
+            <thead>
+                <tr>
+                    <th>Scenario ID</th>
+                    <th>Flops Solved</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="progressBody">
+                <tr><td colspan="3" style="text-align: center; color: #888;">Fetching status...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Launch Batch Job</h2>
+        <p style="color: #aaa; font-size: 0.9em;">Select specific scenarios to compute on this node, or leave empty to compute all.</p>
+        
+        <select id="scenarioSelect" multiple>
+            <option value="01_btn_rfi_vs_bb_call_reg">01_btn_rfi_vs_bb_call_reg</option>
+            <option value="02_btn_rfi_vs_bb_call_fish">02_btn_rfi_vs_bb_call_fish</option>
+            <option value="03_bb_3bet_vs_btn_call">03_bb_3bet_vs_btn_call</option>
+            <option value="04_btn_iso_vs_limper_mp">04_btn_iso_vs_limper_mp</option>
+            <option value="05_bb_defend_vs_btn_rfi">05_bb_defend_vs_btn_rfi</option>
+        </select>
+        
+        <button class="btn" id="startBtn" onclick="startBatch()">🚀 Start Computation</button>
+        
+        <div id="logArea">System ready. Waiting for commands...</div>
+    </div>
+</div>
+
+<script>
+    function log(msg) {
+        const logArea = document.getElementById('logArea');
+        const time = new Date().toLocaleTimeString();
+        logArea.innerHTML += `<div>[${time}] ${msg}</div>`;
+        logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    async function fetchStatus() {
+        try {
+            const res = await fetch('/api/batch/status');
+            const data = await res.json();
+            
+            const badge = document.getElementById('globalStatus');
+            badge.textContent = data.status.toUpperCase();
+            badge.className = `status-badge status-${data.status}`;
+            
+            const tbody = document.getElementById('progressBody');
+            tbody.innerHTML = '';
+            
+            if (Object.keys(data.progress).length === 0 && data.status === 'idle') {
+                 tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888;">No scenarios computed yet on this node.</td></tr>';
+                 return;
+            }
+
+            for (const [scenario, progress] of Object.entries(data.progress)) {
+                const tr = document.createElement('tr');
+                
+                const tdName = document.createElement('td');
+                tdName.textContent = scenario;
+                
+                const tdProg = document.createElement('td');
+                tdProg.textContent = progress;
+                
+                const tdAct = document.createElement('td');
+                // Allow download if there's any progress
+                tdAct.innerHTML = `<button class="btn btn-download" onclick="window.location.href='/api/batch/download/${scenario}'">💾 Download ZIP</button>`;
+                
+                tr.appendChild(tdName);
+                tr.appendChild(tdProg);
+                tr.appendChild(tdAct);
+                tbody.appendChild(tr);
+            }
+        } catch (e) {
+            log('Error fetching status: ' + e.message);
+        }
+    }
+
+    async function startBatch() {
+        const select = document.getElementById('scenarioSelect');
+        const selected = Array.from(select.selectedOptions).map(opt => opt.value);
+        
+        document.getElementById('startBtn').disabled = true;
+        
+        try {
+            log(`Launching ${selected.length > 0 ? selected.length : 'ALL'} scenarios...`);
+            const res = await fetch('/api/batch/start', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({target_scenarios: selected})
+            });
+            
+            const data = await res.json();
+            if (res.ok) {
+                log('Success: ' + data.message);
+                fetchStatus();
+            } else {
+                log('Error: ' + data.detail);
+                document.getElementById('startBtn').disabled = false;
+            }
+        } catch (e) {
+            log('Request failed: ' + e.message);
+            document.getElementById('startBtn').disabled = false;
+        }
+    }
+
+    // Auto-refresh status every 3 seconds
+    setInterval(fetchStatus, 3000);
+    // Initial fetch
+    fetchStatus();
+</script>
+</body>
+</html>

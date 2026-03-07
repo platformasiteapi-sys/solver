@@ -196,3 +196,84 @@ async def solve_poker_state(state: GameState):
 def health_check():
     alive = solver_process is not None and solver_process.returncode is None
     return {"status": "ok", "solver_alive": alive}
+
+# --- Distributed Batch Processing Endpoints ---
+
+import glob
+import subprocess
+
+batch_process = None
+
+from pydantic import BaseModel
+from typing import List, Optional
+
+class BatchRequest(BaseModel):
+    target_scenarios: Optional[List[str]] = []
+
+@app.post("/api/batch/start")
+async def start_batch(req: BatchRequest = None):
+    """Starts the background calculation of requested scenarios."""
+    global batch_process
+    
+    if batch_process is not None and batch_process.poll() is None:
+        raise HTTPException(status_code=400, detail="Batch process is already running.")
+        
+    cmd = ["python", "batch_runner.py"]
+    if req and req.target_scenarios:
+        cmd.extend(req.target_scenarios)
+
+    # Start the batch_runner.py in a separate, detached process
+    # It will use its own TexasSolver instances and won't block the real-time API
+    batch_process = subprocess.Popen(
+        cmd,  # Uses relative path from WORKDIR
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    
+    msg = f"Batch computation started for scenarios: {req.target_scenarios}" if req and req.target_scenarios else "Batch computation started for ALL scenarios."
+    return JSONResponse(content={"status": "success", "message": msg})
+
+@app.get("/api/batch/status")
+async def get_batch_status():
+    """Returns the current progress of the batch computation."""
+    global batch_process
+    
+    status = "running" if (batch_process and batch_process.poll() is None) else "idle"
+    
+    db_dir = os.path.abspath("precalculated_db")
+    progress = {}
+    
+    if os.path.exists(db_dir):
+        for scenario_dir in os.listdir(db_dir):
+            path = os.path.join(db_dir, scenario_dir)
+            if os.path.isdir(path):
+                files = glob.glob(os.path.join(path, "*.json"))
+                progress[scenario_dir] = f"{len(files)} / 184"
+                
+    return JSONResponse(content={"status": status, "progress": progress})
+
+@app.get("/api/batch/download/{scenario_id}")
+async def download_batch_result(scenario_id: str):
+    """Zips the resulting scenario folder and sends it to the user."""
+    import shutil
+    from fastapi.responses import FileResponse
+    
+    db_dir = os.path.abspath("precalculated_db")
+    target_dir = os.path.join(db_dir, scenario_id)
+    
+    if not os.path.exists(target_dir):
+        raise HTTPException(status_code=404, detail="Scenario directory not found or not computed yet.")
+        
+    zip_path = os.path.abspath(f"temp_runs/{scenario_id}.zip")
+    shutil.make_archive(zip_path.replace('.zip', ''), 'zip', target_dir)
+    
+    return FileResponse(zip_path, media_type="application/zip", filename=f"{scenario_id}.zip")
+
+@app.get("/admin")
+async def get_admin_ui():
+    """Serves the mini admin dashboard."""
+    from fastapi.responses import FileResponse
+    admin_path = os.path.abspath("admin.html")
+    if not os.path.exists(admin_path):
+        raise HTTPException(status_code=404, detail="Admin UI file not found.")
+    return FileResponse(admin_path)
