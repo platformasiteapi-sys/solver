@@ -23,17 +23,19 @@ def generate_solver_commands(state: GameState) -> list:
     lines.append(f"set_pot {state.pot}")
     lines.append(f"set_effective_stack {state.effective_stack}")
     lines.append(f"set_board {state.board}")
-    lines.append(f"set_range_ip {state.range_ip}")
-    lines.append(f"set_range_oop {state.range_oop}")
+    # Sanitize ranges to prevent C++ 'format not recognize' crashes
+    clean_ip = state.range_ip.strip().replace(" ", "").replace("\n", "")
+    clean_oop = state.range_oop.strip().replace(" ", "").replace("\n", "")
+    
+    lines.append(f"set_range_ip {clean_ip}")
+    lines.append(f"set_range_oop {clean_oop}")
 
     lines.extend([
-        # Minimal Flop
+        # Minimal Flop (No All-ins)
         "set_bet_sizes oop,flop,bet,50",
         "set_bet_sizes oop,flop,raise,50",
-        "set_bet_sizes oop,flop,allin",
         "set_bet_sizes ip,flop,bet,50",
         "set_bet_sizes ip,flop,raise,50",
-        "set_bet_sizes ip,flop,allin",
 
         # Minimal Turn
         "set_bet_sizes oop,turn,bet,50",
@@ -52,7 +54,9 @@ def generate_solver_commands(state: GameState) -> list:
         "set_bet_sizes ip,river,allin"
     ])
 
-    lines.append(f"set_allin_threshold {state.allin_threshold}")
+    # Extreme tree optimization for real-time play
+    lines.append("set_allin_threshold 0.67")  # Can be mapped to state.allin_threshold later
+    lines.append("set_raise_limit 2")
     lines.append("build_tree")
     lines.append(f"set_thread_num {state.thread_num}")
     lines.append(f"set_accuracy {state.accuracy}")
