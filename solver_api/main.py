@@ -50,24 +50,37 @@ async def _collect_log_until_file(output_path: str, timeout: int = 600) -> str:
             # Drain any remaining stdout lines briefly
             try:
                 while True:
-                    raw = await asyncio.wait_for(solver_process.stdout.readline(), timeout=0.1)
-                    line = raw.decode(errors="replace").rstrip()
-                    if line:
-                        log_lines.append(line)
-                        logger.info(f"[solver] {line}")
+                    raw = await asyncio.wait_for(solver_process.stdout.read(65536), timeout=0.1)
+                    if not raw:
+                        break
+                    text = raw.decode(errors="replace")
+                    if text:
+                        log_lines.append(text)
+                        # Only log short chunks to avoid console freeze on massive range dumps
+                        if len(text) < 1000:
+                            for line in text.splitlines():
+                                if line.strip():
+                                    logger.info(f"[solver] {line.strip()}")
             except asyncio.TimeoutError:
                 pass  # No more pending output
             break
         # Try to read a line of output (short timeout so we keep polling the file)
         try:
-            raw = await asyncio.wait_for(solver_process.stdout.readline(), timeout=0.15)
-            line = raw.decode(errors="replace").rstrip()
-            if line:
-                log_lines.append(line)
-                logger.info(f"[solver] {line}")
+            raw = await asyncio.wait_for(solver_process.stdout.read(65536), timeout=0.15)
+            if not raw:
+                await asyncio.sleep(0.05)
+                continue
+            text = raw.decode(errors="replace")
+            if text:
+                log_lines.append(text)
+                if len(text) < 1000:
+                    for line in text.splitlines():
+                        if line.strip():
+                            logger.info(f"[solver] {line.strip()}")
         except asyncio.TimeoutError:
             await asyncio.sleep(0.05)  # Brief wait before next file poll
-    return "\n".join(log_lines)
+    return "".join(log_lines)
+
 
 
 async def _drain_startup(timeout_idle: float = 1.0) -> str:
@@ -75,14 +88,19 @@ async def _drain_startup(timeout_idle: float = 1.0) -> str:
     lines = []
     while True:
         try:
-            raw = await asyncio.wait_for(solver_process.stdout.readline(), timeout=timeout_idle)
-            line = raw.decode(errors="replace").rstrip()
-            if line:
-                logger.info(f"[solver startup] {line}")
-                lines.append(line)
+            raw = await asyncio.wait_for(solver_process.stdout.read(65536), timeout=timeout_idle)
+            if not raw:
+                break
+            text = raw.decode(errors="replace")
+            if text:
+                if len(text) < 1000:
+                    for line in text.splitlines():
+                        if line.strip():
+                            logger.info(f"[solver startup] {line.strip()}")
+                lines.append(text)
         except asyncio.TimeoutError:
             break  # Nothing more to read — solver is idle and ready
-    return "\n".join(lines)
+    return "".join(lines)
 
 
 async def start_solver_process():
@@ -95,7 +113,7 @@ async def start_solver_process():
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,  # merge stderr into stdout
         cwd=solver_cwd,
-        limit=10 * 1024 * 1024  # Increase limit to 10MB to prevent LimitOverrunError on huge ranges
+        limit=100 * 1024 * 1024  # Increase limit to 100MB to prevent LimitOverrunError on massive range dumps
     )
     await _drain_startup(timeout_idle=2.0)
     logger.info("Solver process is ready.")
