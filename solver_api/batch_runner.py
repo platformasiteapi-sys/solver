@@ -76,26 +76,35 @@ def generate_solver_commands(scenario: Dict, flop: str, dump_path: str) -> List[
     # Generate Tree Betting Structure (Flop, Turn, River)
     for position in ["oop", "ip"]:
         for street in ["flop", "turn", "river"]:
+            
+            # Group all bet sizes for this position/street into a single list
+            # TexasSolver expects: set_bet_sizes ip,flop,bet,33,75
+            current_bets = []
+            
             # Explicit bet sizes: keys like "ip_flop_bet", "oop_turn_bet"
             bet_key = f"{position}_{street}_bet"
             if bet_key in tree:
                 for siz in tree[bet_key]:
-                    cmds.append(f"set_bet_sizes {position},{street},bet,{siz}")
+                    current_bets.append(str(siz))
             
             # Action arrays: keys like "oop_flop", "oop_turn", "oop_river"
-            # These can contain entries like "check", "bet_33", "bet_75"
             action_key = f"{position}_{street}"
             if action_key in tree:
                 for action in tree[action_key]:
                     if isinstance(action, str) and action.startswith("bet_"):
                         bet_size = action.split("_", 1)[1]
-                        cmds.append(f"set_bet_sizes {position},{street},bet,{bet_size}")
+                        if bet_size not in current_bets:
+                            current_bets.append(bet_size)
+                            
+            if current_bets:
+                cmds.append(f"set_bet_sizes {position},{street},bet,{','.join(current_bets)}")
             
-            # Raises: keys like "ip_flop_raise", "oop_turn_raise"
+            # Raises: TexasSolver expects: set_bet_sizes ip,flop,raise,50,100
             raise_key = f"{position}_{street}_raise"
             if raise_key in tree:
-                for siz in tree[raise_key]:
-                    cmds.append(f"set_bet_sizes {position},{street},raise,{siz}")
+                raises = [str(siz) for siz in tree[raise_key]]
+                if raises:
+                    cmds.append(f"set_bet_sizes {position},{street},raise,{','.join(raises)}")
     
     # All-ins
     for street in ["turn", "river"]:
@@ -105,7 +114,8 @@ def generate_solver_commands(scenario: Dict, flop: str, dump_path: str) -> List[
             cmds.append(f"set_bet_sizes ip,{street},allin")
 
     cmds.append(f"set_allin_threshold {settings.get('allin_threshold', 0.67)}")
-    cmds.append(f"set_raise_limit {tree.get('raise_limit', 2)}")
+    # NOTE: set_raise_limit is NOT a valid console command in TexasSolver.
+    # We must let the solver use its default internal raise limit heuristics.
     
     cmds.append("build_tree")
     cmds.append(f"set_thread_num {settings.get('thread_num', 6)}")
@@ -119,7 +129,6 @@ def generate_solver_commands(scenario: Dict, flop: str, dump_path: str) -> List[
     # Note: set_dump_rounds 0 produces null — must be at least 1
     cmds.append("set_dump_rounds 1")
     cmds.append(f"dump_result {dump_path}")
-    cmds.append("exit")
     
     return cmds
 
